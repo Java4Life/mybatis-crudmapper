@@ -1,17 +1,29 @@
 package com.wuxudu.mybatis.crudmapper.domain;
 
 import com.wuxudu.mybatis.crudmapper.domain.param.*;
+import com.wuxudu.mybatis.crudmapper.provider.*;
+import org.apache.ibatis.annotations.DeleteProvider;
+import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 
-public interface CrudMapper {
+import java.util.List;
 
-    int insert(InsertParam param);
+public interface CrudMapper<T> {
 
-    int delete(DeleteParam param);
+    @InsertProvider(type = InsertSqlProvider.class, method = "sql")
+    int insert(InsertParam<T> param);
 
-    int update(UpdateParam param);
+    @DeleteProvider(type = DeleteSqlProvider.class, method = "sql")
+    int delete(DeleteParam<T> param);
 
-    int select(SelectParam param);
+    @UpdateProvider(type = UpdateSqlProvider.class, method = "sql")
+    int update(UpdateParam<T> param);
 
-    long count(CountParam param);
+    @SelectProvider(type = SelectSqlProvider.class, method = "sql")
+    List<T> select(SelectParam<T> param);
+
+    @SelectProvider(type = CountSqlProvider.class, method = "sql")
+    long count(CountParam<T> param);
 
 }
