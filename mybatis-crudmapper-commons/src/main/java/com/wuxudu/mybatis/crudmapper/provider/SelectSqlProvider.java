@@ -14,7 +14,7 @@ import java.util.List;
 
 public class SelectSqlProvider extends ConditionalSqlProvider {
 
-    public String sql(ProviderContext context, SelectParam<?> param) {
+    public String sql(ProviderContext context, SelectParam param) {
 
         Validator.argName("param").notNull(param);
 
@@ -46,7 +46,7 @@ public class SelectSqlProvider extends ConditionalSqlProvider {
 
     }
 
-    private String getOrderBySql(SelectParam<?> param, JpaTable jpaTable) {
+    private String getOrderBySql(SelectParam param, JpaTable jpaTable) {
         List<String> cols = new ArrayList<>();
         for (Sort sort : param.getSorts()) {
             if (sort != null) {

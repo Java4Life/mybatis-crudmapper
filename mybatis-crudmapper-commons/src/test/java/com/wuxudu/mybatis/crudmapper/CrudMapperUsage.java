@@ -19,7 +19,7 @@ public class CrudMapperUsage {
         Condition byName = Condition.by("name").equal("诸葛亮");
         Condition byAddressAndSkill = Condition.and(byAddress, bySkill);
         Condition byNameOrByAddressAndSkill = Condition.or(byName, byAddressAndSkill);
-        SelectParam<User> param = new SelectParam<>();
+        SelectParam param = new SelectParam();
         param.where(byNameOrByAddressAndSkill);
         param.limit(0, 100);
         param.sort(Sort.by("name").asc(), Sort.by("address").desc());

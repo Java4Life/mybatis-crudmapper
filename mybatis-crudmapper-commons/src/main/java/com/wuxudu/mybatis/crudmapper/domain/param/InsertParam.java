@@ -18,7 +18,8 @@ public final class InsertParam<T> {
         return this.entities.toArray(new Object[0]);
     }
 
-    public void values(T... entities) {
+    @SafeVarargs
+    public final void values(T... entities) {
         Validator.argName("entities").notEmpty(entities);
         this.entities.addAll(Arrays.asList(entities));
     }

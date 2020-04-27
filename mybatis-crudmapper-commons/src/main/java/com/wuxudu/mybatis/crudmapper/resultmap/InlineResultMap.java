@@ -43,8 +43,6 @@ public final class InlineResultMap {
             resultMappings.add(builder.build());
         }
 
-        ResultMap resultMap = new ResultMap.Builder(configuration, id, type, resultMappings).build();
-
-        return resultMap;
+        return new ResultMap.Builder(configuration, id, type, resultMappings).build();
     }
 }

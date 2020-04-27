@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class SelectParam<T> extends ConditionalParam {
+public final class SelectParam extends ConditionalParam {
 
     private final List<Sort> sorts = new ArrayList<>();
     private int offset = 0;

@@ -10,7 +10,7 @@ import org.apache.ibatis.jdbc.SQL;
 
 public class CountSqlProvider extends ConditionalSqlProvider {
 
-    public String sql(ProviderContext context, CountParam<?> param) {
+    public String sql(ProviderContext context, CountParam param) {
 
         Validator.argName("param").notNull(param);
 

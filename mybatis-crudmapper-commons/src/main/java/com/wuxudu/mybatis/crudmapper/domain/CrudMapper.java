@@ -15,15 +15,15 @@ public interface CrudMapper<T> {
     int insert(InsertParam<T> param);
 
     @DeleteProvider(type = DeleteSqlProvider.class, method = "sql")
-    int delete(DeleteParam<T> param);
+    int delete(DeleteParam param);
 
     @UpdateProvider(type = UpdateSqlProvider.class, method = "sql")
     int update(UpdateParam<T> param);
 
     @SelectProvider(type = SelectSqlProvider.class, method = "sql")
-    List<T> select(SelectParam<T> param);
+    List<T> select(SelectParam param);
 
     @SelectProvider(type = CountSqlProvider.class, method = "sql")
-    long count(CountParam<T> param);
+    long count(CountParam param);
 
 }
