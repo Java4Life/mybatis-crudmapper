@@ -52,7 +52,7 @@ public class InsertTest {
         int rows = this.mapper.insert(param);
         assertEquals(rows, 1);
         Condition byCreateTime = Condition.by("createTime").greaterThanEqual(now);
-        SelectParam<Employee> query = new SelectParam<>();
+        SelectParam query = new SelectParam();
         query.where(byCreateTime);
         this.mapper.select(query).forEach(employee -> System.out.println(employee.toString()));
     }
@@ -75,7 +75,7 @@ public class InsertTest {
         int rows = this.mapper.insert(param);
         assertEquals(rows, 2);
         Condition byCreateTime = Condition.by("createTime").greaterThanEqual(now);
-        SelectParam<Employee> query = new SelectParam<>();
+        SelectParam query = new SelectParam();
         query.where(byCreateTime);
         this.mapper.select(query).forEach(employee -> System.out.println(employee.toString()));
     }

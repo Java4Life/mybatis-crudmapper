@@ -2,7 +2,6 @@ package com.wuxudu.mybatis.crudmapper.sample;
 
 import com.wuxudu.mybatis.crudmapper.domain.condition.Condition;
 import com.wuxudu.mybatis.crudmapper.domain.param.CountParam;
-import com.wuxudu.mybatis.crudmapper.sample.domain.Employee;
 import com.wuxudu.mybatis.crudmapper.sample.mapper.EmployeeMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,7 @@ public class CountTest {
 
     @Test
     void conditionIsNull() {
-        CountParam<Employee> param = new CountParam<>();
+        CountParam param = new CountParam();
         long count = this.mapper.count(param);
         assertEquals(count, 9);
     }
@@ -35,7 +34,7 @@ public class CountTest {
     @Test
     void greaterThan() {
         Condition condition = Condition.by("id").greaterThan(1);
-        CountParam<Employee> param = new CountParam<>();
+        CountParam param = new CountParam();
         param.where(condition);
         long count = this.mapper.count(param);
         assertEquals(count, 8);

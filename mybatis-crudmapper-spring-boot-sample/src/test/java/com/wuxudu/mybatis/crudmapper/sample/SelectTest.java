@@ -32,7 +32,7 @@ public class SelectTest {
 
     @Test
     void conditionIsNull() {
-        SelectParam<Employee> param = new SelectParam<>();
+        SelectParam param = new SelectParam();
         List<Employee> employees = this.mapper.select(param);
         employees.forEach(employee -> System.out.println(employee.toString()));
         assertEquals(employees.size(), 9);
@@ -41,7 +41,7 @@ public class SelectTest {
     @Test
     void equal() {
         Condition condition = Condition.by("id").equal(1);
-        SelectParam<Employee> param = new SelectParam<>();
+        SelectParam param = new SelectParam();
         param.where(condition);
         List<Employee> employees = this.mapper.select(param);
         employees.forEach(employee -> System.out.println(employee.toString()));
@@ -51,7 +51,7 @@ public class SelectTest {
     @Test
     void notEqual() {
         Condition condition = Condition.by("id").notEqual(1);
-        SelectParam<Employee> param = new SelectParam<>();
+        SelectParam param = new SelectParam();
         param.where(condition);
         List<Employee> employees = this.mapper.select(param);
         employees.forEach(employee -> System.out.println(employee.toString()));
@@ -61,7 +61,7 @@ public class SelectTest {
     @Test
     void greaterThan() {
         Condition condition = Condition.by("id").greaterThan(1);
-        SelectParam<Employee> param = new SelectParam<>();
+        SelectParam param = new SelectParam();
         param.where(condition);
         List<Employee> employees = this.mapper.select(param);
         employees.forEach(employee -> System.out.println(employee.toString()));
@@ -71,7 +71,7 @@ public class SelectTest {
     @Test
     void greaterThanEqual() {
         Condition condition = Condition.by("id").greaterThanEqual(1);
-        SelectParam<Employee> param = new SelectParam<>();
+        SelectParam param = new SelectParam();
         param.where(condition);
         List<Employee> employees = this.mapper.select(param);
         employees.forEach(employee -> System.out.println(employee.toString()));
@@ -81,7 +81,7 @@ public class SelectTest {
     @Test
     void lessThan() {
         Condition condition = Condition.by("createTime").lessThan(LocalDateTime.now());
-        SelectParam<Employee> param = new SelectParam<>();
+        SelectParam param = new SelectParam();
         param.where(condition);
         List<Employee> employees = this.mapper.select(param);
         employees.forEach(employee -> System.out.println(employee.toString()));
@@ -91,7 +91,7 @@ public class SelectTest {
     @Test
     void lessThanEqual() {
         Condition condition = Condition.by("id").lessThanEqual(3);
-        SelectParam<Employee> param = new SelectParam<>();
+        SelectParam param = new SelectParam();
         param.where(condition);
         List<Employee> employees = this.mapper.select(param);
         employees.forEach(employee -> System.out.println(employee.toString()));
@@ -101,7 +101,7 @@ public class SelectTest {
     @Test
     void like() {
         Condition condition = Condition.by("employeeName").like("S%");
-        SelectParam<Employee> param = new SelectParam<>();
+        SelectParam param = new SelectParam();
         param.where(condition);
         List<Employee> employees = this.mapper.select(param);
         employees.forEach(employee -> System.out.println(employee.toString()));
@@ -111,7 +111,7 @@ public class SelectTest {
     @Test
     void in() {
         Condition condition = Condition.by("employeeName").in("Sarah", "Sophia");
-        SelectParam<Employee> param = new SelectParam<>();
+        SelectParam param = new SelectParam();
         param.where(condition);
         List<Employee> employees = this.mapper.select(param);
         employees.forEach(employee -> System.out.println(employee.toString()));
@@ -125,7 +125,7 @@ public class SelectTest {
         Condition bySalaryTop = Condition.by("employeeSalary").lessThanEqual(new BigDecimal(80000));
         Condition bySalary = Condition.and(bySalaryBtm, bySalaryTop);
         Condition condition = Condition.or(bySalary, byName);
-        SelectParam<Employee> param = new SelectParam<>();
+        SelectParam param = new SelectParam();
         param.where(condition);
         List<Employee> employees = this.mapper.select(param);
         employees.forEach(employee -> System.out.println(employee.toString()));
@@ -134,7 +134,7 @@ public class SelectTest {
 
     @Test
     void limit() {
-        SelectParam<Employee> param = new SelectParam<>();
+        SelectParam param = new SelectParam();
         param.limit(1, 3);
         List<Employee> employees = this.mapper.select(param);
         employees.forEach(employee -> System.out.println(employee.toString()));
@@ -143,7 +143,7 @@ public class SelectTest {
 
     @Test
     void sort() {
-        SelectParam<Employee> param = new SelectParam<>();
+        SelectParam param = new SelectParam();
         param.sort(Sort.by("id").asc(), Sort.by("employeeName").desc());
         List<Employee> employees = this.mapper.select(param);
         employees.forEach(employee -> System.out.println(employee.toString()));

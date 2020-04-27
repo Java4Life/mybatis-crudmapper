@@ -1,7 +1,6 @@
 package com.wuxudu.mybatis.crudmapper.sample;
 
 import com.wuxudu.mybatis.crudmapper.domain.condition.Condition;
-import com.wuxudu.mybatis.crudmapper.domain.param.DeleteParam;
 import com.wuxudu.mybatis.crudmapper.domain.param.SelectParam;
 import com.wuxudu.mybatis.crudmapper.domain.param.UpdateParam;
 import com.wuxudu.mybatis.crudmapper.sample.domain.Employee;
@@ -48,7 +47,7 @@ public class UpdateTest {
         param.value(toUpdate);
         int rows = this.mapper.update(param);
         assertEquals(rows, 9);
-        SelectParam<Employee> query = new SelectParam<>();
+        SelectParam query = new SelectParam();
         this.mapper.select(query).forEach(employee -> System.out.println(employee.toString()));
     }
 
@@ -63,7 +62,7 @@ public class UpdateTest {
         param.where(condition);
         int rows = this.mapper.update(param);
         assertEquals(rows, 1);
-        SelectParam<Employee> query = new SelectParam<>();
+        SelectParam query = new SelectParam();
         this.mapper.select(query).forEach(employee -> System.out.println(employee.toString()));
     }
 
