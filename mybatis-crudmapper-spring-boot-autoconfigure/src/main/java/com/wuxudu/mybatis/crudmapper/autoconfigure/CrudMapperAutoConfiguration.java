@@ -1,6 +1,7 @@
 package com.wuxudu.mybatis.crudmapper.autoconfigure;
 
 import com.wuxudu.mybatis.crudmapper.domain.CrudMapper;
+import com.wuxudu.mybatis.crudmapper.exception.CrudMapperException;
 import com.wuxudu.mybatis.crudmapper.mapping.JpaTable;
 import com.wuxudu.mybatis.crudmapper.mapping.JpaTableManager;
 import com.wuxudu.mybatis.crudmapper.resultmap.InlineResultMap;
@@ -51,11 +52,14 @@ public class CrudMapperAutoConfiguration implements InitializingBean {
                     if (mapperInterface != null && type != null) {
 
                         JpaTableManager mgr = JpaTableManager.getInstance();
+                        JpaTable jpaTable = mgr.getAnnotatedJpaTables().get(type.getTypeName());
+                        if (jpaTable == null) {
+                            throw new CrudMapperException("Annotation @Table not found in class " + type.getTypeName());
+                        }
 
                         org.apache.ibatis.session.Configuration mybatisConfig = sqlSessionFactory.getConfiguration();
                         String resultMapId = mapperInterface.getName() + ".select-SelectParam";
                         ResultMap resultMap = mybatisConfig.getResultMap(resultMapId);
-                        JpaTable jpaTable = mgr.getAnnotatedJpaTables().get(type.getTypeName());
 
                         if (resultMap != null && jpaTable != null) {
 
