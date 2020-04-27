@@ -149,4 +149,10 @@ public class SelectTest {
         employees.forEach(employee -> System.out.println(employee.toString()));
         assertEquals(employees.size(), 9);
     }
+
+    @Test
+    void customInXml() {
+        Employee employee = this.mapper.selectById(1);
+        System.out.println(employee.toString());
+    }
 }

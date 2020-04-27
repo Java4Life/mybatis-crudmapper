@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wuxudu.mybatis.crudmapper.sample.mapper.EmployeeMapper">
+
+    <resultMap id="ShortResultMap" type="com.wuxudu.mybatis.crudmapper.sample.domain.Employee">
+        <id column="id" property="id"/>
+        <result column="employee_no" property="employeeNo"/>
+        <result column="employee_name" property="employeeName"/>
+    </resultMap>
+
+    <select id="selectById" parameterType="int" resultMap="ShortResultMap">
+        SELECT * FROM T_EMPLOYEE WHERE ID = #{id}
+    </select>
+
+</mapper>

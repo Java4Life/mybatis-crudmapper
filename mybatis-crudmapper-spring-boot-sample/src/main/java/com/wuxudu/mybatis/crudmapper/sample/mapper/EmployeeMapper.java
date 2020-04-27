@@ -7,4 +7,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface EmployeeMapper extends CrudMapper<Employee> {
 
+    Employee selectById(int id);
+
 }
