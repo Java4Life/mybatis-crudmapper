@@ -12,7 +12,6 @@
     <artifactId>mybatis-crudmapper-commons</artifactId>
 
     <name>mybatis-crudmapper-commons</name>
-    <url>http://www.wuxudu.com</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

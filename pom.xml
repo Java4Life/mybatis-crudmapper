@@ -8,7 +8,7 @@
     <artifactId>mybatis-crudmapper</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
-    
+
     <modules>
         <module>mybatis-crudmapper-commons</module>
         <module>mybatis-crudmapper-spring-boot-autoconfigure</module>
@@ -25,4 +25,5 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
 </project>
