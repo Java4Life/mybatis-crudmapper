@@ -4,10 +4,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <groupId>com.wuxudu</groupId>
     <artifactId>mybatis-crudmapper</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
+
+    <name>mybatis-crudmapper</name>
+    <url>https://github.com/Java4Life/mybatis-crudmapper</url>
+    <description>MyBatis Generic CrudMapper with Spring Boot</description>
 
     <modules>
         <module>mybatis-crudmapper-commons</module>
@@ -25,5 +35,27 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:Java4Life/mybatis-crudmapper.git</connection>
+        <developerConnection>scm:git:git@github.com:Java4Life/mybatis-crudmapper.git</developerConnection>
+        <url>https://github.com/Java4Life/mybatis-crudmapper/tree/master</url>
+        <tag>1.0</tag>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>Liu Guojian</name>
+            <email>liuguojian@outlook.com</email>
+        </developer>
+    </developers>
 
 </project>
