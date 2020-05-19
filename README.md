@@ -12,6 +12,44 @@ Apache Maven:
 Prerequisites：
 JDK 1.8+，mybatis 3.5.3，SpringBoot 2.2.5.RELEASE, mybatis-spring-boot-starter 2.1.1
 
+Entity:
+
+        public abstract class AbstractEntity {
+            @Id
+            @Column(name = "id", insertable = false, updatable = false)
+            private Long id;
+
+            @Column(name = "create_time", insertable = false, updatable = false)
+            private LocalDateTime createTime;
+
+            @Column(name = "update_time", insertable = false, updatable = false)
+            private LocalDateTime updateTime;
+        ...
+        }
+    
+        @Table(name = "t_employee")
+        public class Employee extends AbstractEntity {
+
+            @Column(name = "employee_no")
+            private String employeeNo;
+
+            @Column(name = "employee_name")
+            private String employeeName;
+
+            @Column(name = "employee_years")
+            private Integer employedYears;
+
+            @Column(name = "employee_salary")
+            private BigDecimal employeeSalary;
+        ...
+        }
+
+Mapper:
+
+        @Mapper
+        public interface EmployeeMapper extends CrudMapper<Employee> {
+        }
+
 Usage(more in mybatis-crudmapper-spring-boot-sample testcases):
 
     @Test
