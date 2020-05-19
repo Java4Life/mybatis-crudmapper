@@ -8,6 +8,9 @@ Apache Maven:
             <artifactId>mybatis-crudmapper-spring-boot-starter</artifactId>
             <version>1.0</version>
         </dependency>
+        
+Prerequisites：
+JDK 1.8+，mybatis 3.5.3，SpringBoot 2.2.5.RELEASE, mybatis-spring-boot-starter 2.1.1
 
 Usage(more in mybatis-crudmapper-spring-boot-sample testcases):
 
