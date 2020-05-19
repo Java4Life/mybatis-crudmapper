@@ -3,11 +3,11 @@ MyBatis Generic CrudMapper with Spring Boot
 
 Apache Maven:
 
-<dependency>
-  <groupId>com.wuxudu</groupId>
-  <artifactId>mybatis-crudmapper-spring-boot-starter</artifactId>
-  <version>1.0</version>
-</dependency>
+        <dependency>
+            <groupId>com.wuxudu</groupId>
+            <artifactId>mybatis-crudmapper-spring-boot-starter</artifactId>
+            <version>1.0</version>
+        </dependency>
 
 Usage(more in mybatis-crudmapper-spring-boot-sample testcases):
 
