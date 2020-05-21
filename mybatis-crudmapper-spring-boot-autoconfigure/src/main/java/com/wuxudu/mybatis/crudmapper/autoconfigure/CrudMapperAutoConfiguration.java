@@ -2,10 +2,12 @@ package com.wuxudu.mybatis.crudmapper.autoconfigure;
 
 import com.wuxudu.mybatis.crudmapper.domain.CrudMapper;
 import com.wuxudu.mybatis.crudmapper.exception.CrudMapperException;
+import com.wuxudu.mybatis.crudmapper.mapping.JpaColumn;
 import com.wuxudu.mybatis.crudmapper.mapping.JpaTable;
 import com.wuxudu.mybatis.crudmapper.mapping.JpaTableManager;
 import com.wuxudu.mybatis.crudmapper.resultmap.InlineResultMap;
 import org.apache.ibatis.binding.MapperProxy;
+import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.BeansException;
@@ -58,10 +60,12 @@ public class CrudMapperAutoConfiguration implements InitializingBean {
                         }
 
                         org.apache.ibatis.session.Configuration mybatisConfig = sqlSessionFactory.getConfiguration();
+
+                        // replace select resultmap
                         String resultMapId = mapperInterface.getName() + ".select-SelectParam";
                         ResultMap resultMap = mybatisConfig.getResultMap(resultMapId);
 
-                        if (resultMap != null && jpaTable != null) {
+                        if (resultMap != null) {
 
                             mgr.mapping(mapperInterface, jpaTable);
 
@@ -90,6 +94,38 @@ public class CrudMapperAutoConfiguration implements InitializingBean {
                                 Field field = ReflectionUtils.findField(resultMap.getClass(), propertyName);
                                 ReflectionUtils.makeAccessible(field);
                                 ReflectionUtils.setField(field, resultMap, value);
+                            }
+                        }
+
+                        // replace keyProperty and keyColumn
+                        JpaColumn idColumn = jpaTable.getIdColumn();
+                        if (idColumn != null) {
+
+                            String[] properties = {
+                                    "keyProperties",
+                                    "keyColumns"
+                            };
+
+                            Object[] values = {
+                                    new String[]{idColumn.getFieldName()},
+                                    new String[]{idColumn.getColumnName()}
+                            };
+
+                            String[] methodNames = {
+                                    "insertOne",
+                                    "insertAll"
+                            };
+
+                            for (String methodName : methodNames) {
+                                String statementId = mapperInterface.getName() + "." + methodName;
+                                MappedStatement statement = mybatisConfig.getMappedStatement(statementId);
+                                for (int i = 0; i < properties.length; i++) {
+                                    String propertyName = properties[i];
+                                    Object value = values[i];
+                                    Field field = ReflectionUtils.findField(statement.getClass(), propertyName);
+                                    ReflectionUtils.makeAccessible(field);
+                                    ReflectionUtils.setField(field, statement, value);
+                                }
                             }
                         }
                     }

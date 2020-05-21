@@ -64,4 +64,8 @@ public final class JpaTable {
     public String getTableName() {
         return tableName;
     }
+
+    public JpaColumn getIdColumn() {
+        return idColumn;
+    }
 }

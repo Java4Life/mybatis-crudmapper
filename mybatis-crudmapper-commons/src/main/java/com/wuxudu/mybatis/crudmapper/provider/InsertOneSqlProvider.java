@@ -1,6 +1,5 @@
 package com.wuxudu.mybatis.crudmapper.provider;
 
-import com.wuxudu.mybatis.crudmapper.domain.param.InsertParam;
 import com.wuxudu.mybatis.crudmapper.mapping.JpaColumn;
 import com.wuxudu.mybatis.crudmapper.mapping.JpaTable;
 import com.wuxudu.mybatis.crudmapper.validator.Validator;
@@ -10,12 +9,11 @@ import org.apache.ibatis.builder.annotation.ProviderContext;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InsertSqlProvider extends AbstractSqlProvider {
+public class InsertOneSqlProvider extends AbstractSqlProvider {
 
-    public String sql(ProviderContext context, InsertParam<?> param) {
+    public String sql(ProviderContext context, Object entity) {
 
-        Validator.argName("param").notNull(param);
-        Validator.argName("param.entities").notEmpty(param.values());
+        Validator.argName("entity").notNull(entity);
 
         JpaTable jpaTable = this.getJpaTable(context);
         String tableName = jpaTable.getTableName();
@@ -39,22 +37,16 @@ public class InsertSqlProvider extends AbstractSqlProvider {
         sb.append(") ");
         sb.append("VALUES ");
 
-        List<String> rows = new ArrayList<>();
+        List<String> cols = new ArrayList<>();
 
-        for (int i = 0; i < param.values().length; i++) {
-
-            List<String> cols = new ArrayList<>();
-
-            for (String fieldName : fieldNames) {
-                cols.add("#{entities[" + i + "]." + fieldName + "}");
-            }
-
-            rows.add("(" + StringUtils.join(cols, ",") + ")");
+        for (String fieldName : fieldNames) {
+            cols.add("#{" + fieldName + "}");
         }
 
-        sb.append(StringUtils.join(rows, ","));
+        sb.append("(" + StringUtils.join(cols, ",") + ")");
 
         return sb.toString();
 
     }
+
 }

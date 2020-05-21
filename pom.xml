@@ -7,7 +7,7 @@
     <groupId>com.wuxudu</groupId>
     <artifactId>mybatis-crudmapper</artifactId>
     <packaging>pom</packaging>
-    <version>1.0</version>
+    <version>1.1</version>
 
     <name>mybatis-crudmapper</name>
     <url>https://github.com/Java4Life/mybatis-crudmapper</url>

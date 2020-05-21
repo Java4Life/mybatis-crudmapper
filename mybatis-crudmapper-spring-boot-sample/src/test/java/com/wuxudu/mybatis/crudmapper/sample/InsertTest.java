@@ -1,7 +1,6 @@
 package com.wuxudu.mybatis.crudmapper.sample;
 
 import com.wuxudu.mybatis.crudmapper.domain.condition.Condition;
-import com.wuxudu.mybatis.crudmapper.domain.param.InsertParam;
 import com.wuxudu.mybatis.crudmapper.domain.param.SelectParam;
 import com.wuxudu.mybatis.crudmapper.sample.domain.Employee;
 import com.wuxudu.mybatis.crudmapper.sample.mapper.EmployeeMapper;
@@ -11,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -23,17 +23,7 @@ public class InsertTest {
     @Test
     void paramIsNull() {
         try {
-            this.mapper.insert(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    void valueIsNull() {
-        try {
-            InsertParam<Employee> param = new InsertParam<>();
-            this.mapper.insert(param);
+            this.mapper.insertAll(null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -47,9 +37,7 @@ public class InsertTest {
         toInsert.setEmployeeName("name1");
         toInsert.setEmployedYears(1);
         toInsert.setEmployeeSalary(new BigDecimal("1"));
-        InsertParam<Employee> param = new InsertParam<>();
-        param.values(toInsert);
-        int rows = this.mapper.insert(param);
+        int rows = this.mapper.insertOne(toInsert);
         assertEquals(rows, 1);
         Condition byCreateTime = Condition.by("createTime").greaterThanEqual(now);
         SelectParam query = new SelectParam();
@@ -70,9 +58,7 @@ public class InsertTest {
         employee2.setEmployeeName("name2");
         employee2.setEmployedYears(2);
         employee2.setEmployeeSalary(new BigDecimal("2"));
-        InsertParam<Employee> param = new InsertParam<>();
-        param.values(employee1, employee2);
-        int rows = this.mapper.insert(param);
+        int rows = this.mapper.insertAll(Arrays.asList(employee1,employee2));
         assertEquals(rows, 2);
         Condition byCreateTime = Condition.by("createTime").greaterThanEqual(now);
         SelectParam query = new SelectParam();
