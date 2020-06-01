@@ -10,10 +10,10 @@ import java.util.List;
 public final class SelectParam extends ConditionalParam {
 
     private final List<Sort> sorts = new ArrayList<>();
-    private int offset = 0;
+    private long offset = 0;
     private int limit = 1000;
 
-    public void limit(int offset, int limit) {
+    public void limit(long offset, int limit) {
         Validator.argName("offset").notNegative(offset);
         Validator.argName("limit").notNegativeOrZero(limit);
         this.offset = offset;
@@ -25,7 +25,7 @@ public final class SelectParam extends ConditionalParam {
         this.sorts.addAll(Arrays.asList(sorts));
     }
 
-    public int getOffset() {
+    public long getOffset() {
         return offset;
     }
 

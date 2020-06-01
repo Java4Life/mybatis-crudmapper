@@ -38,13 +38,13 @@ public final class Validator {
         this.notEmpty(argument.toArray());
     }
 
-    public void notNegative(int number) {
+    public void notNegative(long number) {
         if (number < 0) {
             throw new IllegalArgumentException(String.format("Argument %s must not be negative number", argumentName));
         }
     }
 
-    public void notNegativeOrZero(int number) {
+    public void notNegativeOrZero(long number) {
         this.notNegative(number);
         if (number == 0) {
             throw new IllegalArgumentException(String.format("Argument %s must not be zero", argumentName));
