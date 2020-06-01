@@ -99,7 +99,7 @@ public class CrudMapperAutoConfiguration implements InitializingBean {
 
                         // replace keyProperty and keyColumn
                         JpaColumn idColumn = jpaTable.getIdColumn();
-                        if (idColumn != null) {
+                        if (idColumn != null && !idColumn.isInsertable()) {
 
                             String[] properties = {
                                     "keyProperties",
