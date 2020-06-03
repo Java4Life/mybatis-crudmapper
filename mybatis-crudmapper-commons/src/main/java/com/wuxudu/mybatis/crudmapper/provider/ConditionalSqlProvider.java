@@ -20,8 +20,10 @@ public abstract class ConditionalSqlProvider extends AbstractSqlProvider {
             return this.parseSql((ConditionElement) condition, jpaTable);
         } else if (condition instanceof ConditionGroup) {
             String sql = this.parseSql((ConditionGroup) condition, jpaTable);
-            sql = StringUtils.removeStart(sql, "(");
-            sql = StringUtils.removeEnd(sql, ")");
+            if (((ConditionGroup) condition).getConditions().size() > 1) {
+                sql = StringUtils.removeStart(sql, "(");
+                sql = StringUtils.removeEnd(sql, ")");
+            }
             return sql;
         } else {
             return null;

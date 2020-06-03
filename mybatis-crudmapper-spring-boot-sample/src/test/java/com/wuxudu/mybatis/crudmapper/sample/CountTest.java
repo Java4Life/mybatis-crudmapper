@@ -40,4 +40,15 @@ public class CountTest {
         assertEquals(count, 8);
     }
 
+    @Test
+    void in() {
+        Condition condition1 = Condition.by("id").in(1, 2);
+        Condition condition2 = Condition.by("id").in(1, 2);
+        Condition condition3 = Condition.and(condition1, condition2);
+        Condition condition4 = Condition.by("id").in(1, 2);
+        CountParam param = new CountParam();
+        param.where(Condition.or(condition3, condition4));
+        long count = this.mapper.count(param);
+        assertEquals(count, 2);
+    }
 }
