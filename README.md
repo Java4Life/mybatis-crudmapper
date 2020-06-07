@@ -6,7 +6,7 @@ Apache Maven:
     <dependency>
         <groupId>com.wuxudu</groupId>
         <artifactId>mybatis-crudmapper-spring-boot-starter</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
     </dependency>
         
 Prerequisites：
