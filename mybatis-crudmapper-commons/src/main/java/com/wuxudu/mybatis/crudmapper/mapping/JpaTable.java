@@ -55,7 +55,7 @@ public final class JpaTable {
         JpaColumn jpaColumn = this.columnMap.get(fieldName);
         if (jpaColumn == null) {
             String format = "Column map not found for field %s.%s";
-            String message = String.format(format, this.tableName, fieldName);
+            String message = String.format(format, this.tableClass.getName(), fieldName);
             throw new CrudMapperException(message);
         }
         return jpaColumn;
