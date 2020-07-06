@@ -7,12 +7,16 @@
     <groupId>com.wuxudu</groupId>
     <artifactId>mybatis-crudmapper</artifactId>
     <packaging>pom</packaging>
-    <version>1.5</version>
+    <version>${mybatis-crudmapper.version}</version>
 
     <name>mybatis-crudmapper</name>
     <url>https://github.com/Java4Life/mybatis-crudmapper</url>
     <description>MyBatis Generic CrudMapper with Spring Boot</description>
 
+    <properties>
+    	<mybatis-crudmapper.version>1.5</mybatis-crudmapper.version>
+    </properties>
+    
     <modules>
         <module>mybatis-crudmapper-commons</module>
         <module>mybatis-crudmapper-spring-boot-autoconfigure</module>
@@ -118,4 +122,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

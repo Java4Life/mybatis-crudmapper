@@ -1,11 +1,17 @@
 package com.wuxudu.mybatis.crudmapper.autoconfigure;
 
-import com.wuxudu.mybatis.crudmapper.domain.CrudMapper;
-import com.wuxudu.mybatis.crudmapper.exception.CrudMapperException;
-import com.wuxudu.mybatis.crudmapper.mapping.JpaColumn;
-import com.wuxudu.mybatis.crudmapper.mapping.JpaTable;
-import com.wuxudu.mybatis.crudmapper.mapping.JpaTableManager;
-import com.wuxudu.mybatis.crudmapper.resultmap.InlineResultMap;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import javax.persistence.Table;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.ibatis.binding.MapperProxy;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ResultMap;
@@ -17,186 +23,209 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.util.ReflectionUtils;
 
-import javax.persistence.Table;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.logging.Logger;
+import com.wuxudu.mybatis.crudmapper.domain.CrudMapper;
+import com.wuxudu.mybatis.crudmapper.exception.CrudMapperException;
+import com.wuxudu.mybatis.crudmapper.mapping.JpaColumn;
+import com.wuxudu.mybatis.crudmapper.mapping.JpaTable;
+import com.wuxudu.mybatis.crudmapper.mapping.JpaTableManager;
+import com.wuxudu.mybatis.crudmapper.resultmap.InlineResultMap;
 
 @Configuration
 @Import(CrudMapperAutoConfiguration.AutoConfiguredTableScannerRegistrar.class)
 public class CrudMapperAutoConfiguration implements InitializingBean {
 
-    @Autowired
-    private SqlSessionFactory sqlSessionFactory;
+	private static final String SELECT_RESULT_MAP_ID = "select-SelectParam";
+	private static final String RESULTMAP_PROPERTY_RESULTMAPPINGS = "resultMappings";
+	private static final String RESULTMAP_PROPERTY_IDRESULTMAPPINGS = "idResultMappings";
+	private static final String RESULTMAP_PROPERTY_PROPERTYRESULTMAPPINGS = "propertyResultMappings";
+	private static final String RESULTMAP_PROPERTY_MAPPEDCOLUMNS = "mappedColumns";
+	private static final String RESULTMAP_PROPERTY_MAPPEDPROPERTIES = "mappedProperties";
+	private static final String MAPPEDSTATEMENT_PROPERTY_KEYPROPERTIES = "keyProperties";
+	private static final String MAPPEDSTATEMENT_PROPERTY_KEYCOLUMNS = "keyColumns";
+	private static final String MAPPEDSTATEMENT_METHODNAME_INSERTONE = "insertOne";
+	private static final String MAPPEDSTATEMENT_METHODNAME_INSERTALL = "insertAll";
+	private static final String PROXY_PROPERTY_H = "h";
+	private static final String PROXY_PROPERTY_MAPPERINTERFACE = "mapperInterface";
 
-    @Autowired
-    private List<CrudMapper<?>> crudMappers;
+	@Autowired
+	private SqlSessionFactory sqlSessionFactory;
 
-    @Autowired
-    private JpaTableManager jpaTableManager;
+	@Autowired
+	private List<CrudMapper<?>> crudMappers;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        if (sqlSessionFactory != null && crudMappers != null && jpaTableManager != null) {
-            crudMappers.forEach(crudMapper -> {
-                if (Proxy.isProxyClass(crudMapper.getClass())) {
+	@Autowired
+	private JpaTableManager jpaTableManager;
 
-                    Class<?> mapperInterface = this.getMapperClass(crudMapper);
-                    Type type = this.getParameterizedType(mapperInterface);
+	@Override
+	public void afterPropertiesSet() throws Exception {
 
-                    if (mapperInterface != null && type != null) {
+		if (this.sqlSessionFactory == null) {
+			throw new CrudMapperException("No SqlSessionFactory instance autowired");
+		}
 
-                        JpaTableManager mgr = JpaTableManager.getInstance();
-                        JpaTable jpaTable = mgr.getAnnotatedJpaTables().get(type.getTypeName());
-                        if (jpaTable == null) {
-                            throw new CrudMapperException("Annotation @Table not found in class " + type.getTypeName());
-                        }
+		if (CollectionUtils.isEmpty(this.crudMappers)) {
+			throw new CrudMapperException("No CrudMapper instances autowired");
+		}
 
-                        org.apache.ibatis.session.Configuration mybatisConfig = sqlSessionFactory.getConfiguration();
+		if (this.jpaTableManager == null) {
+			throw new CrudMapperException("No JpaTableManager instance autowired");
+		}
 
-                        // replace select resultmap
-                        String resultMapId = mapperInterface.getName() + ".select-SelectParam";
-                        ResultMap resultMap = mybatisConfig.getResultMap(resultMapId);
+		JpaTableManager mgr = JpaTableManager.getInstance();
 
-                        if (resultMap != null) {
+		for (CrudMapper<?> crudMapper : this.crudMappers) {
 
-                            mgr.mapping(mapperInterface, jpaTable);
+			// check proxy
+			Class<?> mapperClass = crudMapper.getClass();
+			if (!Proxy.isProxyClass(mapperClass)) {
+				throw new CrudMapperException("CrudMapper class " + mapperClass + " is not a proxy class");
+			}
 
-                            InlineResultMap inlineResultMap = new InlineResultMap(resultMapId, jpaTable, mybatisConfig);
-                            ResultMap newResultMap = inlineResultMap.build();
+			// check interface
+			Class<?> mapperInterface = this.getMapperInterface(crudMapper);
+			if (mapperInterface == null) {
+				throw new CrudMapperException("CrudMapper interface not found for " + mapperClass);
+			}
 
-                            String[] properties = {
-                                    "resultMappings",
-                                    "idResultMappings",
-                                    "propertyResultMappings",
-                                    "mappedColumns",
-                                    "mappedProperties"
-                            };
+			// check parameterized type
+			Type type = this.getParameterizedType(mapperInterface);
+			if (type == null) {
+				throw new CrudMapperException("CrudMapper parameterized type not defined for " + mapperInterface.getName());
+			}
 
-                            Object[] values = {
-                                    newResultMap.getResultMappings(),
-                                    newResultMap.getIdResultMappings(),
-                                    newResultMap.getPropertyResultMappings(),
-                                    newResultMap.getMappedColumns(),
-                                    newResultMap.getMappedProperties()
-                            };
+			// check jpaTable
+			JpaTable jpaTable = mgr.getAnnotatedJpaTables().get(type.getTypeName());
+			if (jpaTable == null) {
+				throw new CrudMapperException("Annotation @Table not found in class " + type.getTypeName());
+			}
+			mgr.mapping(mapperInterface, jpaTable);
 
-                            for (int i = 0; i < properties.length; i++) {
-                                String propertyName = properties[i];
-                                Object value = values[i];
-                                Field field = ReflectionUtils.findField(resultMap.getClass(), propertyName);
-                                ReflectionUtils.makeAccessible(field);
-                                ReflectionUtils.setField(field, resultMap, value);
-                            }
-                        }
+			// reflect select resultMap
+			this.replaceSelectResultMapConfig(mapperInterface, jpaTable);
 
-                        // replace keyProperty and keyColumn
-                        JpaColumn idColumn = jpaTable.getIdColumn();
-                        if (idColumn != null && !idColumn.isInsertable()) {
+			// reflect insert keyProperty and keyColumn
+			this.replaceInsertKeyConfig(mapperInterface, jpaTable);
+		}
+	}
 
-                            String[] properties = {
-                                    "keyProperties",
-                                    "keyColumns"
-                            };
+	private void replaceSelectResultMapConfig(Class<?> mapperInterface, JpaTable jpaTable) {
+		// get original select ResultMap
+		org.apache.ibatis.session.Configuration mybatisConfig = this.sqlSessionFactory.getConfiguration();
+		String resultMapId = mapperInterface.getName() + "." + SELECT_RESULT_MAP_ID;
+		ResultMap resultMap = mybatisConfig.getResultMap(resultMapId);
+		if (resultMap == null) {
+			throw new CrudMapperException("ResultMap " + resultMapId + " not found in org.apache.ibatis.session.Configuration");
+		}
 
-                            Object[] values = {
-                                    new String[]{idColumn.getFieldName()},
-                                    new String[]{idColumn.getColumnName()}
-                            };
+		// reflect select ResultMap properties
+		ResultMap newResultMap = new InlineResultMap(resultMapId, jpaTable, mybatisConfig).build();
+		Map<String, Object> substitutes = new HashMap<>();
+		substitutes.put(RESULTMAP_PROPERTY_RESULTMAPPINGS, newResultMap.getResultMappings());
+		substitutes.put(RESULTMAP_PROPERTY_IDRESULTMAPPINGS, newResultMap.getIdResultMappings());
+		substitutes.put(RESULTMAP_PROPERTY_PROPERTYRESULTMAPPINGS, newResultMap.getPropertyResultMappings());
+		substitutes.put(RESULTMAP_PROPERTY_MAPPEDCOLUMNS, newResultMap.getMappedColumns());
+		substitutes.put(RESULTMAP_PROPERTY_MAPPEDPROPERTIES, newResultMap.getMappedProperties());
+		substitutes.forEach((k, v) -> {
+			Field field = ReflectionUtils.findField(resultMap.getClass(), k);
+			ReflectionUtils.makeAccessible(field);
+			ReflectionUtils.setField(field, resultMap, v);
+		});
+	}
 
-                            String[] methodNames = {
-                                    "insertOne",
-                                    "insertAll"
-                            };
+	private void replaceInsertKeyConfig(Class<?> mapperInterface, JpaTable jpaTable) {
 
-                            for (String methodName : methodNames) {
-                                String statementId = mapperInterface.getName() + "." + methodName;
-                                MappedStatement statement = mybatisConfig.getMappedStatement(statementId);
-                                for (int i = 0; i < properties.length; i++) {
-                                    String propertyName = properties[i];
-                                    Object value = values[i];
-                                    Field field = ReflectionUtils.findField(statement.getClass(), propertyName);
-                                    ReflectionUtils.makeAccessible(field);
-                                    ReflectionUtils.setField(field, statement, value);
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    }
+		org.apache.ibatis.session.Configuration mybatisConfig = this.sqlSessionFactory.getConfiguration();
 
-    private Class<?> getMapperClass(Object proxy) {
-        Field h = ReflectionUtils.findField(proxy.getClass(), "h");
-        ReflectionUtils.makeAccessible(h);
-        MapperProxy mapperProxy = (MapperProxy) ReflectionUtils.getField(h, proxy);
-        Field mapperInterface = ReflectionUtils.findField(mapperProxy.getClass(), "mapperInterface");
-        ReflectionUtils.makeAccessible(mapperInterface);
-        return (Class<?>) ReflectionUtils.getField(mapperInterface, mapperProxy);
-    }
+		JpaColumn idColumn = jpaTable.getIdColumn();
 
-    private Type getParameterizedType(Class<?> clazz) {
-        Type[] genericInterfaces = clazz.getGenericInterfaces();
-        for (Type genericInterface : genericInterfaces) {
-            if (ParameterizedType.class.isAssignableFrom(genericInterface.getClass())) {
-                ParameterizedType parameterizedType = (ParameterizedType) genericInterface;
-                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-                for (Type actualTypeArgument : actualTypeArguments) {
-                    return actualTypeArgument;
-                }
-            }
-        }
-        return null;
-    }
+		if (idColumn != null && !idColumn.isInsertable()) {
+			String[] methodNames = { MAPPEDSTATEMENT_METHODNAME_INSERTONE, MAPPEDSTATEMENT_METHODNAME_INSERTALL };
+			Map<String, Object> substitutes = new HashMap<>();
+			substitutes.put(MAPPEDSTATEMENT_PROPERTY_KEYPROPERTIES, new String[] { idColumn.getFieldName() });
+			substitutes.put(MAPPEDSTATEMENT_PROPERTY_KEYCOLUMNS, new String[] { idColumn.getColumnName() });
+			for (String methodName : methodNames) {
+				String statementId = mapperInterface.getName() + "." + methodName;
+				MappedStatement statement = mybatisConfig.getMappedStatement(statementId);
+				substitutes.forEach((k, v) -> {
+					Field field = ReflectionUtils.findField(statement.getClass(), k);
+					ReflectionUtils.makeAccessible(field);
+					ReflectionUtils.setField(field, statement, v);
+				});
+			}
+		}
+	}
 
-    public static class AutoConfiguredTableScannerRegistrar implements BeanFactoryAware, ImportBeanDefinitionRegistrar {
+	private Class<?> getMapperInterface(Object proxy) {
+		Field h = ReflectionUtils.findField(proxy.getClass(), PROXY_PROPERTY_H);
+		ReflectionUtils.makeAccessible(h);
+		MapperProxy<?> mapperProxy = (MapperProxy<?>) ReflectionUtils.getField(h, proxy);
+		Field mapperInterface = ReflectionUtils.findField(mapperProxy.getClass(), PROXY_PROPERTY_MAPPERINTERFACE);
+		ReflectionUtils.makeAccessible(mapperInterface);
+		return (Class<?>) ReflectionUtils.getField(mapperInterface, mapperProxy);
+	}
 
-        Logger logger = Logger.getLogger(AutoConfiguredTableScannerRegistrar.class.getName());
+	private Type getParameterizedType(Class<?> clazz) {
+		Type[] genericInterfaces = clazz.getGenericInterfaces();
+		for (Type genericInterface : genericInterfaces) {
+			if (ParameterizedType.class.isAssignableFrom(genericInterface.getClass())) {
+				ParameterizedType parameterizedType = (ParameterizedType) genericInterface;
+				Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+				for (Type actualTypeArgument : actualTypeArguments) {
+					return actualTypeArgument;
+				}
+			}
+		}
+		return null;
+	}
 
-        private BeanFactory beanFactory;
+	public static class AutoConfiguredTableScannerRegistrar implements BeanFactoryAware, ImportBeanDefinitionRegistrar {
 
-        @Override
-        public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-            this.beanFactory = beanFactory;
-        }
+		Logger logger = Logger.getLogger(AutoConfiguredTableScannerRegistrar.class.getName());
 
-        @Bean
-        @ConditionalOnMissingBean
-        public JpaTableManager jpaTableManager() {
+		private BeanFactory beanFactory;
 
-            if (!AutoConfigurationPackages.has(this.beanFactory)) {
-                logger.warning("Could not determine auto-configuration package, automatic @Table mappings scanning disabled");
-                return null;
-            }
+		@Override
+		public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+			this.beanFactory = beanFactory;
+		}
 
-            logger.info("Searching for classes annotated with @Table");
+		@Bean
+		@ConditionalOnMissingBean
+		public JpaTableManager jpaTableManager() {
 
-            ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
-            scanner.addIncludeFilter(new AnnotationTypeFilter(Table.class));
+			if (!AutoConfigurationPackages.has(this.beanFactory)) {
+				logger.warning("Could not determine auto-configuration package, automatic @Table mappings scanning disabled");
+				return null;
+			}
 
-            JpaTableManager mgr = JpaTableManager.getInstance();
+			logger.info("Searching for classes annotated with @Table");
 
-            List<String> basePackages = AutoConfigurationPackages.get(this.beanFactory);
-            for (final String basePackage : basePackages) {
-                scanner.findCandidateComponents(basePackage).forEach(beanDefinition -> {
-                    String className = beanDefinition.getBeanClassName();
-                    mgr.register(className);
-                });
-            }
+			ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
+			scanner.addIncludeFilter(new AnnotationTypeFilter(Table.class));
 
-            int count = mgr.getAnnotatedJpaTables().size();
-            logger.info(count + " @Table annotation(s) found");
+			JpaTableManager mgr = JpaTableManager.getInstance();
 
-            return mgr;
-        }
-    }
+			List<String> basePackages = AutoConfigurationPackages.get(this.beanFactory);
+			for (final String basePackage : basePackages) {
+				scanner.findCandidateComponents(basePackage).forEach(beanDefinition -> {
+					String className = beanDefinition.getBeanClassName();
+					mgr.register(className);
+				});
+			}
+
+			int count = mgr.getAnnotatedJpaTables().size();
+			logger.info(count + " @Table annotation(s) found");
+
+			return mgr;
+		}
+	}
 
 }

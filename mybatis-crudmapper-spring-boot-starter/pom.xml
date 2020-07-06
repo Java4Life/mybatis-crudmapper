@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.wuxudu</groupId>
         <artifactId>mybatis-crudmapper</artifactId>
-        <version>1.5</version>
+        <version>${mybatis-crudmapper.version}</version>
     </parent>
 
     <artifactId>mybatis-crudmapper-spring-boot-starter</artifactId>
