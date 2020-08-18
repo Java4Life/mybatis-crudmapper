@@ -12,7 +12,9 @@
 	</parent>
 
 	<artifactId>mybatis-crudmapper-spring-boot-starter</artifactId>
-
+	
+	<packaging>jar</packaging>
+	
 	<name>mybatis-crudmapper-spring-boot-starter</name>
 
 	<properties>
@@ -25,7 +27,7 @@
 		<dependency>
 			<groupId>com.wuxudu</groupId>
 			<artifactId>mybatis-crudmapper-spring-boot-autoconfigure</artifactId>
-			<version>1.5</version>
+			<version>${mybatis-crudmapper.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

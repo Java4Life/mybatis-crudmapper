@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>com.wuxudu</groupId>
 			<artifactId>mybatis-crudmapper-commons</artifactId>
-			<version>1.5</version>
+			<version>${mybatis-crudmapper.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mybatis</groupId>
