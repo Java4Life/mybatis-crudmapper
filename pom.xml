@@ -14,7 +14,7 @@
     <description>MyBatis Generic CrudMapper with Spring Boot</description>
 
     <properties>
-    	<mybatis-crudmapper.version>1.6</mybatis-crudmapper.version>
+    	<mybatis-crudmapper.version>1.7</mybatis-crudmapper.version>
     </properties>
     
     <modules>
